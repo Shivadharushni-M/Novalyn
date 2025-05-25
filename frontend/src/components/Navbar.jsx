@@ -11,8 +11,6 @@ import {
   Avatar,
   Button,
   MenuItem,
-  useTheme,
-  alpha,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -26,9 +24,9 @@ import {
   Lightbulb as LightbulbIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import styles from '../styles/Navbar.module.css';
 
 const Navbar = () => {
-  const theme = useTheme();
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const { user, logout } = useAuth();
@@ -65,185 +63,106 @@ const Navbar = () => {
   ];
 
   return (
-    <AppBar 
-      position="sticky" 
-      sx={{ 
-        bgcolor: alpha(theme.palette.background.default, 0.8),
-        backdropFilter: 'blur(20px)',
-      }}
-      elevation={0}
-    >
-      <Container maxWidth="lg">
-        <Toolbar disableGutters>
-          {/* Logo - Desktop */}
-          <Typography
-            variant="h6"
-            noWrap
-            component={RouterLink}
-            to="/"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontWeight: 700,
-              color: 'primary.main',
-              textDecoration: 'none',
-            }}
+    <div className={styles.navbar}>
+      <div className={styles.container}>
+        <RouterLink to="/" className={styles.logo}>
+          NOVALYN
+        </RouterLink>
+
+        {/* Mobile Menu */}
+        <div className={styles.mobileMenu}>
+          <IconButton
+            size="large"
+            aria-label="menu"
+            onClick={handleOpenNavMenu}
+            className={styles.menuButton}
           >
-            NOVALYN
-          </Typography>
-
-          {/* Mobile Menu */}
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{
-                display: { xs: 'block', md: 'none' },
-              }}
-            >
-              {user && pages.map((page) => (
-                <MenuItem
-                  key={page.name}
-                  onClick={handleCloseNavMenu}
-                  component={RouterLink}
-                  to={page.path}
-                  selected={location.pathname === page.path}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    {page.icon}
-                    <Typography textAlign="center">{page.name}</Typography>
-                  </Box>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-
-          {/* Logo - Mobile */}
-          <Typography
-            variant="h5"
-            noWrap
-            component={RouterLink}
-            to="/"
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontWeight: 700,
-              color: 'primary.main',
-              textDecoration: 'none',
-            }}
+            <MenuIcon />
+          </IconButton>
+          <Menu
+            anchorEl={anchorElNav}
+            open={Boolean(anchorElNav)}
+            onClose={handleCloseNavMenu}
+            className={styles.mobileNav}
           >
-            NOVALYN
-          </Typography>
-
-          {/* Desktop Menu */}
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, gap: 2 }}>
             {user && pages.map((page) => (
-              <Button
+              <MenuItem
                 key={page.name}
+                onClick={handleCloseNavMenu}
                 component={RouterLink}
                 to={page.path}
-                onClick={handleCloseNavMenu}
-                sx={{
-                  color: location.pathname === page.path ? 'primary.main' : 'text.primary',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  '&:hover': {
-                    color: 'primary.main',
-                  },
-                }}
+                className={`${styles.mobileNavLink} ${location.pathname === page.path ? styles.active : ''}`}
               >
                 {page.icon}
-                {page.name}
-              </Button>
+                <span>{page.name}</span>
+              </MenuItem>
             ))}
-          </Box>
+          </Menu>
+        </div>
 
-          {/* User Menu */}
-          <Box sx={{ flexGrow: 0 }}>
-            {user ? (
-              <>
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar
-                    alt={user.name}
-                    src={user.profilePicture}
-                    sx={{
-                      bgcolor: theme.palette.primary.main,
-                      color: theme.palette.primary.contrastText,
-                    }}
-                  >
-                    {user.name?.charAt(0)}
-                  </Avatar>
-                </IconButton>
-                <Menu
-                  sx={{ mt: '45px' }}
-                  id="menu-appbar"
-                  anchorEl={anchorElUser}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  open={Boolean(anchorElUser)}
-                  onClose={handleCloseUserMenu}
-                >
-                  <MenuItem
-                    component={RouterLink}
-                    to="/profile"
-                    onClick={handleCloseUserMenu}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <PersonIcon fontSize="small" />
-                      <Typography textAlign="center">Profile</Typography>
-                    </Box>
-                  </MenuItem>
-                  <MenuItem onClick={handleLogout}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <LogoutIcon fontSize="small" />
-                      <Typography textAlign="center">Logout</Typography>
-                    </Box>
-                  </MenuItem>
-                </Menu>
-              </>
-            ) : (
-              <Button
-                component={RouterLink}
-                to="/login"
-                color="primary"
-                startIcon={<LoginIcon />}
+        {/* Desktop Navigation */}
+        <div className={styles.navLinks}>
+          {user && pages.map((page) => (
+            <RouterLink
+              key={page.name}
+              to={page.path}
+              className={`${styles.navLink} ${location.pathname === page.path ? styles.active : ''}`}
+            >
+              {page.icon}
+              <span>{page.name}</span>
+            </RouterLink>
+          ))}
+        </div>
+
+        {/* User Menu */}
+        <div className={styles.userMenu}>
+          {user ? (
+            <>
+              <Avatar
+                onClick={handleOpenUserMenu}
+                src={user.profilePicture}
+                alt={user.name}
+                className={styles.avatar}
               >
-                Login
-              </Button>
-            )}
-          </Box>
-        </Toolbar>
-      </Container>
-    </AppBar>
+                {user.name?.charAt(0)}
+              </Avatar>
+              <Menu
+                anchorEl={anchorElUser}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+                className={styles.dropdown}
+              >
+                <MenuItem
+                  component={RouterLink}
+                  to="/profile"
+                  onClick={handleCloseUserMenu}
+                  className={styles.dropdownItem}
+                >
+                  <PersonIcon className={styles.icon} />
+                  <span>Profile</span>
+                </MenuItem>
+                <MenuItem
+                  onClick={handleLogout}
+                  className={styles.dropdownItem}
+                >
+                  <LogoutIcon className={styles.icon} />
+                  <span>Logout</span>
+                </MenuItem>
+              </Menu>
+            </>
+          ) : (
+            <Button
+              component={RouterLink}
+              to="/login"
+              startIcon={<LoginIcon />}
+              className={styles.loginButton}
+            >
+              Login
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 
